@@ -38,6 +38,11 @@ MANUAL_ICON_URLS = {
     "来宾电视台综合": "https://raw.githubusercontent.com/CCSH/IPTV/main/logo/来宾综合.png",
     "钦州新闻综合": "https://raw.githubusercontent.com/CCSH/IPTV/main/logo/钦州新闻综合高清.png",
     "珠江卫视": "https://raw.githubusercontent.com/fanmingming/live/main/tv/广东珠江.png",
+    "桂林公共频道": "https://static.wikia.nocookie.net/logos/images/1/19/桂林TV2.png/revision/latest?cb=20250826033944&path-prefix=vi",
+    "桂林科教旅游": "https://static.wikia.nocookie.net/logos/images/d/dc/桂林科教旅游_logo.png/revision/latest?cb=20250205120301&path-prefix=vi",
+    "柳州科教": "https://static.wikia.nocookie.net/logos/images/d/d6/柳州科教_logo.png/revision/latest?cb=20250117111358&path-prefix=vi",
+    "北海经济科教": "https://static.wikia.nocookie.net/logos/images/6/6c/北海经济科教.png/revision/latest?cb=20241115101215&path-prefix=vi",
+    "贵港科教生活": "https://i0.hdslb.com/bfs/article/8ac1aa1ef10a3b85d693b8e97a7910e9382367415.png",
 }
 
 
