@@ -40,6 +40,10 @@ EXCLUDED_CHANNEL_NAMES = {
     "潮妈辣婆",
     "西藏卫视藏语",
     "西藏卫视藏语频道",
+    "卡酷少儿",
+    "山东教育",
+    "北海新闻",
+    "钦州综合",
 }
 
 EXCLUDED_CHANNEL_PREFIXES = (
