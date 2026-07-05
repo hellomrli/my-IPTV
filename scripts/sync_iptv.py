@@ -38,7 +38,31 @@ EXCLUDED_CHANNEL_NAMES = {
     "精品记录",
     "精品纪录",
     "潮妈辣婆",
+    "西藏卫视藏语",
+    "西藏卫视藏语频道",
 }
+
+EXCLUDED_CHANNEL_PREFIXES = (
+    "CGTN",
+    "CETV",
+)
+
+EXCLUDED_CHANNEL_KEYWORDS = (
+    "中国教育",
+    "中国国际电视台",
+    "标清4M",
+    "西藏卫视藏语",
+)
+
+
+def is_excluded_channel_name(name: str, extinf: str = "") -> bool:
+    text = f"{name} {extinf}"
+    return (
+        name in EXCLUDED_CHANNEL_NAMES
+        or any(name.startswith(prefix) for prefix in EXCLUDED_CHANNEL_PREFIXES)
+        or any(keyword in text for keyword in EXCLUDED_CHANNEL_KEYWORDS)
+        or "CGTN" in text
+    )
 
 
 @dataclass
@@ -172,19 +196,29 @@ def build_added_extinf(upstream: Entry, group: str) -> str:
     return extinf
 
 
+def group_sort_entries(entries: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    group_order: list[str] = []
+    buckets: dict[str, list[tuple[str, str]]] = {}
+    for extinf, url in entries:
+        group = group_name(extinf)
+        if group not in buckets:
+            buckets[group] = []
+            group_order.append(group)
+        buckets[group].append((extinf, url))
+    return [entry for group in group_order for entry in buckets[group]]
+
+
 def sync_playlist(template_text: str, upstream_text: str, add_missing: bool) -> tuple[str, dict[str, int]]:
     template_header, template_entries = parse_m3u(template_text)
     upstream_header, upstream_entries = parse_m3u(upstream_text)
     upstream_best = {key: entry for key, entry in best_by_channel(upstream_entries).items() if entry.channel_id}
     template_best = best_by_channel(template_entries)
-    excluded_keys = {normalize_name(name) for name in EXCLUDED_CHANNEL_NAMES}
-
     seen: set[str] = set()
     output_entries: list[tuple[str, str]] = []
     stats = {"updated": 0, "unchanged": 0, "removed_duplicates": 0, "excluded": 0, "added": 0, "missing_upstream": 0}
 
     for entry in template_entries:
-        if entry.key in excluded_keys:
+        if is_excluded_channel_name(entry.name, entry.extinf):
             stats["excluded"] += 1
             continue
         if template_best.get(entry.key) is not entry:
@@ -207,7 +241,7 @@ def sync_playlist(template_text: str, upstream_text: str, add_missing: bool) -> 
     if add_missing and template_entries:
         template_url = template_entries[0].url
         for key, upstream in upstream_best.items():
-            if key in seen or key in excluded_keys or not upstream.channel_id:
+            if key in seen or is_excluded_channel_name(upstream.name, upstream.extinf) or not upstream.channel_id:
                 continue
             group = upstream.group or "未分组"
             output_entries.append((build_added_extinf(upstream, group), proxy_url_from_template(template_url, upstream.channel_id)))
@@ -217,7 +251,7 @@ def sync_playlist(template_text: str, upstream_text: str, add_missing: bool) -> 
     header = template_header if template_header else upstream_header
     parts = [header]
     last_group = None
-    for extinf, url in output_entries:
+    for extinf, url in group_sort_entries(output_entries):
         group = group_name(extinf)
         if last_group is not None and group != last_group:
             parts.append("")
