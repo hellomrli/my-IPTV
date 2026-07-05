@@ -262,10 +262,10 @@ def sync_playlist(template_text: str, upstream_text: str, add_missing: bool) -> 
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Sync IPTVnew.m3u from upstream while preserving local proxy format.")
+    parser = argparse.ArgumentParser(description="Sync IPTV.m3u from upstream while preserving local proxy format.")
     parser.add_argument("--upstream", default=DEFAULT_UPSTREAM, help="Upstream m3u URL or file path.")
-    parser.add_argument("--template", default="IPTVnew.m3u", help="Local template m3u path.")
-    parser.add_argument("--output", default="IPTVnew.m3u", help="Output m3u path.")
+    parser.add_argument("--template", default="IPTV.m3u", help="Local template m3u path.")
+    parser.add_argument("--output", default="IPTV.m3u", help="Output m3u path.")
     parser.add_argument("--no-add-missing", action="store_true", help="Only update channels already present in the template.")
     parser.add_argument("--backup", action="store_true", help="Create a .bak copy before overwriting output.")
     args = parser.parse_args()

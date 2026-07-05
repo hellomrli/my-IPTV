@@ -1,6 +1,6 @@
 # my-IPTV
 
-同步上游广西移动 IPTV 列表，并保留本地 `IPTVnew.m3u` 的代理转发格式、分组和排序。
+同步上游广西移动 IPTV 列表，并保留本地 `IPTV.m3u` 的代理转发格式、分组和排序。
 
 ## 同步规则
 
@@ -15,8 +15,8 @@
 
 ```bash
 python3 scripts/sync_iptv.py \
-  --template /home/lain/下载/IPTVnew.m3u \
-  --output /home/lain/下载/IPTVnew.m3u \
+  --template /home/lain/下载/IPTV.m3u \
+  --output /home/lain/下载/IPTV.m3u \
   --backup
 ```
 
