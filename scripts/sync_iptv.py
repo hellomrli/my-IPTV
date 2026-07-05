@@ -23,6 +23,23 @@ QUALITY_WORDS = {
     "标清": 10,
 }
 
+EXCLUDED_CHANNEL_NAMES = {
+    "南宁公共",
+    "玉林公共",
+    "防城港公共",
+    "钦州公共影视",
+    "苏州4K",
+    "古装剧场",
+    "军旅剧场",
+    "家庭剧场",
+    "惊悚悬疑",
+    "精品综合",
+    "金牌综艺",
+    "精品记录",
+    "精品纪录",
+    "潮妈辣婆",
+}
+
 
 @dataclass
 class Entry:
@@ -160,12 +177,16 @@ def sync_playlist(template_text: str, upstream_text: str, add_missing: bool) -> 
     upstream_header, upstream_entries = parse_m3u(upstream_text)
     upstream_best = {key: entry for key, entry in best_by_channel(upstream_entries).items() if entry.channel_id}
     template_best = best_by_channel(template_entries)
+    excluded_keys = {normalize_name(name) for name in EXCLUDED_CHANNEL_NAMES}
 
     seen: set[str] = set()
     output_entries: list[tuple[str, str]] = []
-    stats = {"updated": 0, "unchanged": 0, "removed_duplicates": 0, "added": 0, "missing_upstream": 0}
+    stats = {"updated": 0, "unchanged": 0, "removed_duplicates": 0, "excluded": 0, "added": 0, "missing_upstream": 0}
 
     for entry in template_entries:
+        if entry.key in excluded_keys:
+            stats["excluded"] += 1
+            continue
         if template_best.get(entry.key) is not entry:
             stats["removed_duplicates"] += 1
             continue
@@ -186,7 +207,7 @@ def sync_playlist(template_text: str, upstream_text: str, add_missing: bool) -> 
     if add_missing and template_entries:
         template_url = template_entries[0].url
         for key, upstream in upstream_best.items():
-            if key in seen or not upstream.channel_id:
+            if key in seen or key in excluded_keys or not upstream.channel_id:
                 continue
             group = upstream.group or "未分组"
             output_entries.append((build_added_extinf(upstream, group), proxy_url_from_template(template_url, upstream.channel_id)))
