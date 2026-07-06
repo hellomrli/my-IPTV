@@ -92,6 +92,8 @@ http://192.168.50.250:8080/3221226351/index.m3u8?servicetype=1
 http://192.168.50.250:8080/3221226352/index.m3u8?servicetype=1
 #EXTINF:-1 tvg-name="河池新闻综合 高清" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/%E6%B2%B3%E6%B1%A0%E6%96%B0%E9%97%BB%E7%BB%BC%E5%90%88.png" group-title="广西",河池新闻综合
 http://192.168.50.250:8080/3221226356/index.m3u8?servicetype=1
+#EXTINF:-1 tvg-name="钦州新闻综合 高清" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/%E9%92%A6%E5%B7%9E%E6%96%B0%E9%97%BB%E7%BB%BC%E5%90%88.png" group-title="广西",钦州新闻综合
+http://192.168.50.250:8080/3221226347/index.m3u8?servicetype=1
 
 #EXTINF:-1 tvg-id="41" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/%E4%B8%9C%E5%8D%97%E5%8D%AB%E8%A7%86.png" group-title="卫视",东南卫视
 http://192.168.50.250:8080/3221225904/index.m3u8?servicetype=1
@@ -244,6 +246,3 @@ http://192.168.50.250:8080/3221226698/index.m3u8?servicetype=1
 http://192.168.50.250:8080/3221226691/index.m3u8?servicetype=1
 #EXTINF:-1 tvg-name="世界杯经典回顾 高清" tvg-logo="http://images.center.bcs.ottcn.com:8080/images/ysten/images/ysten/TV/HD-4000k-1080P-sjbjdhg/GX0604SJBJDHGTB.png" group-title="精彩热播",世界杯经典回顾
 http://192.168.50.250:8080/3221226701/index.m3u8?servicetype=1
-
-#EXTINF:-1 tvg-name="钦州新闻综合 高清" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/%E9%92%A6%E5%B7%9E%E6%96%B0%E9%97%BB%E7%BB%BC%E5%90%88.png" group-title="广西",钦州新闻综合
-http://192.168.50.250:8080/3221226347/index.m3u8?servicetype=1
