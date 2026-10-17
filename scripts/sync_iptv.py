@@ -5,6 +5,7 @@ import shutil
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 
@@ -13,6 +14,14 @@ CHANNEL_ID_RE = re.compile(r"/(\d+)/index\.m3u8", re.IGNORECASE)
 GROUP_RE = re.compile(r'group-title="([^"]*)"')
 TVG_NAME_RE = re.compile(r'tvg-name="([^"]*)"')
 TVG_CHNO_RE = re.compile(r'\s+tvg-chno="[^"]*"')
+LOGO_RE = re.compile(r'tvg-logo="([^"]*)"')
+
+# The upstream playlist points some logos at the operator's image host, which
+# hangs for 100 seconds per request inside Jellyfin (guide refresh errors).
+# Rewrite those to the icons shipped with this repository.
+LOGO_BASE = "https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/"
+BAD_LOGO_HOSTS = ("images.center.bcs.ottcn.com",)
+LOGO_NAME_OVERRIDES = {"CCTV-16 4K": "CCTV16"}
 
 # Channel numbers are assigned per group so the lineup stays sorted in clients
 # and there is room to insert new channels without renumbering everything.
@@ -214,6 +223,14 @@ def build_added_extinf(upstream: Entry, group: str) -> str:
     return extinf
 
 
+def sanitize_logo(extinf: str, name: str) -> str:
+    match = LOGO_RE.search(extinf)
+    if not match or not any(host in match.group(1) for host in BAD_LOGO_HOSTS):
+        return extinf
+    icon = LOGO_NAME_OVERRIDES.get(name, name)
+    return extinf[: match.start()] + f'tvg-logo="{LOGO_BASE}{quote(icon)}.png"' + extinf[match.end():]
+
+
 def with_channel_number(extinf: str, number: int) -> str:
     extinf = TVG_CHNO_RE.sub("", extinf)
     match = re.search(r'tvg-id="[^"]*"', extinf)
@@ -284,6 +301,8 @@ def sync_playlist(template_text: str, upstream_text: str, add_missing: bool) -> 
             output_entries.append((build_added_extinf(upstream, group), proxy_url_from_template(template_url, upstream.channel_id)))
             seen.add(key)
             stats["added"] += 1
+
+    output_entries = [(sanitize_logo(extinf, channel_name(extinf)), url) for extinf, url in output_entries]
 
     header = template_header if template_header else upstream_header
     parts = [header]

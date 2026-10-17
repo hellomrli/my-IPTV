@@ -240,12 +240,12 @@ http://192.168.50.250:8080/3221225684/index.m3u8?servicetype=1
 http://192.168.50.250:8080/3221225724/index.m3u8?servicetype=1
 #EXTINF:-1 tvg-chno="318" tvg-name="炫舞未来 高清" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/%E7%82%AB%E8%88%9E%E6%9C%AA%E6%9D%A5.png" group-title="精彩热播",炫舞未来
 http://192.168.50.250:8080/3221225973/index.m3u8?servicetype=1
-#EXTINF:-1 tvg-chno="319" tvg-name="绝对巨星C罗 高清" tvg-logo="http://images.center.bcs.ottcn.com:8080/images/ysten/images/ysten/TV/HD-4000k-1080P-jdjxcl/GX0604JDJXCLTB.png" group-title="精彩热播",绝对巨星C罗
+#EXTINF:-1 tvg-chno="319" tvg-name="绝对巨星C罗 高清" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/%E7%BB%9D%E5%AF%B9%E5%B7%A8%E6%98%9FC%E7%BD%97.png" group-title="精彩热播",绝对巨星C罗
 http://192.168.50.250:8080/3221226698/index.m3u8?servicetype=1
-#EXTINF:-1 tvg-chno="320" tvg-name="绝对巨星梅西 高清" tvg-logo="http://images.center.bcs.ottcn.com:8080/images/ysten/images/ysten/TV/HD-4000k-1080P-jdjxmx/GX0604JDJXMXTB.png" group-title="精彩热播",绝对巨星梅西
+#EXTINF:-1 tvg-chno="320" tvg-name="绝对巨星梅西 高清" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/%E7%BB%9D%E5%AF%B9%E5%B7%A8%E6%98%9F%E6%A2%85%E8%A5%BF.png" group-title="精彩热播",绝对巨星梅西
 http://192.168.50.250:8080/3221226691/index.m3u8?servicetype=1
-#EXTINF:-1 tvg-chno="321" tvg-name="世界杯经典回顾 高清" tvg-logo="http://images.center.bcs.ottcn.com:8080/images/ysten/images/ysten/TV/HD-4000k-1080P-sjbjdhg/GX0604SJBJDHGTB.png" group-title="精彩热播",世界杯经典回顾
+#EXTINF:-1 tvg-chno="321" tvg-name="世界杯经典回顾 高清" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/%E4%B8%96%E7%95%8C%E6%9D%AF%E7%BB%8F%E5%85%B8%E5%9B%9E%E9%A1%BE.png" group-title="精彩热播",世界杯经典回顾
 http://192.168.50.250:8080/3221226701/index.m3u8?servicetype=1
 
-#EXTINF:-1 tvg-chno="600" tvg-name="CCTV-16 4K 超清" tvg-logo="http://images.center.bcs.ottcn.com:8080/images/ysten/images/ysten/TV/HD-20M-2160P-cctv16/GX0902ALPKTB.png" group-title="全国热播",CCTV-16 4K
+#EXTINF:-1 tvg-chno="600" tvg-name="CCTV-16 4K 超清" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/CCTV16.png" group-title="全国热播",CCTV-16 4K
 http://192.168.50.250:8080/3221226690/index.m3u8?servicetype=1
