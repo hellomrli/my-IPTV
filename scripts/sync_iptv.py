@@ -12,6 +12,20 @@ DEFAULT_UPSTREAM = "https://raw.githubusercontent.com/Healer-sys/Home/main/iptv/
 CHANNEL_ID_RE = re.compile(r"/(\d+)/index\.m3u8", re.IGNORECASE)
 GROUP_RE = re.compile(r'group-title="([^"]*)"')
 TVG_NAME_RE = re.compile(r'tvg-name="([^"]*)"')
+TVG_CHNO_RE = re.compile(r'\s+tvg-chno="[^"]*"')
+
+# Channel numbers are assigned per group so the lineup stays sorted in clients
+# and there is room to insert new channels without renumbering everything.
+GROUP_NUMBER_BASE = {
+    "央视": 1,
+    "卫视": 100,
+    "广西": 200,
+    "精彩热播": 300,
+    "国际": 400,
+    "4K频道": 500,
+    "全国热播": 600,
+}
+DEFAULT_GROUP_NUMBER_BASE = 900
 
 QUALITY_WORDS = {
     "8k": 70,
@@ -200,6 +214,25 @@ def build_added_extinf(upstream: Entry, group: str) -> str:
     return extinf
 
 
+def with_channel_number(extinf: str, number: int) -> str:
+    extinf = TVG_CHNO_RE.sub("", extinf)
+    match = re.search(r'tvg-id="[^"]*"', extinf)
+    if match:
+        return extinf[: match.end()] + f' tvg-chno="{number}"' + extinf[match.end():]
+    return re.sub(r"(#EXTINF:[^\s]+)", rf'\1 tvg-chno="{number}"', extinf, count=1)
+
+
+def number_entries(entries: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    counters: dict[int, int] = {}
+    numbered: list[tuple[str, str]] = []
+    for extinf, url in entries:
+        base = GROUP_NUMBER_BASE.get(group_name(extinf), DEFAULT_GROUP_NUMBER_BASE)
+        offset = counters.get(base, 0)
+        counters[base] = offset + 1
+        numbered.append((with_channel_number(extinf, base + offset), url))
+    return numbered
+
+
 def group_sort_entries(entries: list[tuple[str, str]]) -> list[tuple[str, str]]:
     group_order: list[str] = []
     buckets: dict[str, list[tuple[str, str]]] = {}
@@ -255,7 +288,7 @@ def sync_playlist(template_text: str, upstream_text: str, add_missing: bool) -> 
     header = template_header if template_header else upstream_header
     parts = [header]
     last_group = None
-    for extinf, url in group_sort_entries(output_entries):
+    for extinf, url in number_entries(group_sort_entries(output_entries)):
         group = group_name(extinf)
         if last_group is not None and group != last_group:
             parts.append("")
