@@ -249,3 +249,8 @@ http://192.168.50.250:8080/3221226701/index.m3u8?servicetype=1
 
 #EXTINF:-1 tvg-chno="600" tvg-name="CCTV-16 4K 超清" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/CCTV16.png" group-title="全国热播",CCTV-16 4K
 http://192.168.50.250:8080/3221226690/index.m3u8?servicetype=1
+
+#EXTINF:-1 tvg-chno="900" tvg-name="北京卫视4K 4K" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/%E5%8C%97%E4%BA%AC%E5%8D%AB%E8%A7%864K.png" group-title="本地及特色",北京卫视4K
+http://192.168.50.250:8080/3221226333/index.m3u8?servicetype=1
+#EXTINF:-1 tvg-chno="901" tvg-name="广东卫视4K 4K" tvg-logo="https://raw.githubusercontent.com/hellomrli/my-IPTV/main/icon/%E5%B9%BF%E4%B8%9C%E5%8D%AB%E8%A7%864K.png" group-title="本地及特色",广东卫视4K
+http://192.168.50.250:8080/3221226707/index.m3u8?servicetype=1
