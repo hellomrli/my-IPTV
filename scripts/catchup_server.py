@@ -91,32 +91,37 @@ def probe(url):
 def resolve_range(cid, start, end):
     """把 [start, end) 翻译成实际存在的片段列表。
 
-    序号与时间大体是 线性(6段/分钟) 关系, 但存在漂移和空洞:
-    先在起点附近做漂移搜索, 之后线性外推并抽样校验(每12段探一次),
-    抽检失败再局部重搜; 完全找不到的 30 秒空洞直接跳过。
+    网关片段时间戳不与绝对 10 秒整对齐(存在相位差), 因此所有片段的
+    (unix, seq) 一律从直播锚点按整段数回推, 不做独立的时间取整:
+        n 段前 -> unix_a - n*10, seq_a - n
+    序号与时间大体线性, 但存在漂移和空洞: 先在起点附近做漂移搜索,
+    之后线性外推并抽样校验(每12段探一次), 抽检失败再局部重搜;
+    完全找不到的 30 秒空洞直接跳过。
     """
     base, sess, unix_a, seq_a = fetch_live(cid)
+    n0 = (unix_a - start) // SEG_DUR          # 起点所在段(不早于 start)
+    n1 = (unix_a - end) // SEG_DUR            # 终点所在段
     drift = None
     segs = []
-    unix = start - start % SEG_DUR
+    n = n0
     i = 0
-    while unix < end:
-        exp_seq = seq_a - (unix_a - unix) // SEG_DUR
+    while n > n1:
+        unix, seq = unix_a - n * SEG_DUR, seq_a - n
         need_probe = drift is None or i % 12 == 0
         if need_probe:
             cands = DRIFTS if drift is None else [drift + d for d in (0, -6, 6, -12, 12, -30, 30)]
             hit = None
             for d in cands:
-                if probe(seg_url(base, sess, cid, unix, exp_seq + d)):
+                if probe(seg_url(base, sess, cid, unix, seq + d)):
                     hit = d
                     break
             if hit is None:
-                unix += 30
+                n -= 3                          # 空洞: 跳过 30 秒
                 i += 3
                 continue
             drift = hit
-        segs.append((unix, exp_seq + drift))
-        unix += SEG_DUR
+        segs.append((unix, seq + drift))
+        n -= 1
         i += 1
     return base, sess, cid, segs
 
