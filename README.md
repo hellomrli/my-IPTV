@@ -95,3 +95,24 @@ python3 -m py_compile scripts/sync_iptv.py scripts/update_icons.py
 - 本仓库不包含账号、Cookie、密钥等敏感信息。
 - 如需改变代理地址，请修改模板 playlist 中第一条可识别的频道 URL，脚本会沿用该 URL 格式替换频道 ID。
 - 如果新增频道生成的 URL 不符合预期，请先确认模板 URL 中包含 `/{频道ID}/index.m3u8` 结构。
+
+## test 分支: 回看(catchup)支持
+
+本分支新增两个播放列表与一个回看翻译服务, 用于测试服务端回看:
+
+- `gx.m3u` — 原始地址版(与 `IPTV.m3u` 相同的转发地址, 无 catchup 属性)。
+- `IPTV-catchup.m3u` — 转换版: 给实测有服务端回看存储的 79 个频道追加了
+  `catchup` / `catchup-days` / `catchup-source` 属性, 指向局域网回看翻译服务。
+- `scripts/catchup_server.py` — 回看翻译服务。广西移动 ITV 网关不提供 playseek
+  接口, 但历史 TS 片段按 `{unix时间戳}-1-{序号}.hls.ts` 规律可寻址; 本服务把
+  `catchup-source` 里的时间参数翻译成实际存在的片段并合成 HLS VOD 播放列表。
+
+运行方式(在局域网内任一常开机器上):
+
+```bash
+python3 scripts/catchup_server.py 8081 http://192.168.50.250:8080
+```
+
+播放器(酷9/TVBox 系)订阅 `IPTV-catchup.m3u` 后, 对这 79 个频道即可按节目单
+回看(湖南卫视约 7 天、浙江卫视约 4 天、其余约 1 天)。注意: 网关对历史片段
+的开放程度会波动(疑似存在限流保护), 短时 404 属正常, 服务内置了探测容错。
