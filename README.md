@@ -100,8 +100,11 @@ python3 -m py_compile scripts/sync_iptv.py scripts/update_icons.py
 
 本分支新增两个播放列表与一个回看翻译服务, 用于测试服务端回看:
 
-- `gx.m3u` — 原始地址版(与 `IPTV.m3u` 相同的转发地址, 无 catchup 属性)。
-- `IPTV-catchup.m3u` — 转换版: 给实测有服务端回看存储的 79 个频道追加了
+- `gx.m3u` — 移动源直连地址版: 频道流地址直接指向广西移动 ITV 源站
+  `cdnrrs.gx.chinamobile.com`(上游 `PLTV/77777777/224/{频道ID}` 格式),
+  不经过本地 `192.168.50.250:8080` 转发, 仅在能路由到 ITV 网络的设备上可用。
+- `IPTV-catchup.m3u` — 本地转发+回看版: 走 `192.168.50.250:8080` 转发,
+  并给实测有服务端回看存储的 79 个频道追加了
   `catchup` / `catchup-days` / `catchup-source` 属性, 指向局域网回看翻译服务。
 - `scripts/catchup_server.py` — 回看翻译服务。广西移动 ITV 网关不提供 playseek
   接口, 但历史 TS 片段按 `{unix时间戳}-1-{序号}.hls.ts` 规律可寻址; 本服务把
