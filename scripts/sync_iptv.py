@@ -15,6 +15,7 @@ GROUP_RE = re.compile(r'group-title="([^"]*)"')
 TVG_NAME_RE = re.compile(r'tvg-name="([^"]*)"')
 TVG_CHNO_RE = re.compile(r'\s+tvg-chno="[^"]*"')
 LOGO_RE = re.compile(r'tvg-logo="([^"]*)"')
+CATCHUP_SOURCE_RE = re.compile(r'catchup-source="([^"]*)"')
 
 # The upstream playlist points some logos at the operator's image host, which
 # hangs for 100 seconds per request inside Jellyfin (guide refresh errors).
@@ -112,11 +113,20 @@ def read_text(path_or_url: str) -> str:
     return Path(path_or_url).read_text(encoding="utf-8-sig")
 
 
+def split_extinf(extinf: str) -> tuple[str, str]:
+    quoted = False
+    for index, char in enumerate(extinf):
+        if char == '"':
+            quoted = not quoted
+        elif char == "," and not quoted:
+            return extinf[:index], extinf[index + 1:]
+    return extinf, ""
+
+
 def channel_name(extinf: str) -> str:
-    if "," in extinf:
-        name = extinf.rsplit(",", 1)[1].strip()
-        if name:
-            return name
+    name = split_extinf(extinf)[1].strip()
+    if name:
+        return name
     match = TVG_NAME_RE.search(extinf)
     return match.group(1).strip() if match else ""
 
@@ -214,6 +224,17 @@ def proxy_url_from_template(template_url: str, channel_id: str) -> str:
     return CHANNEL_ID_RE.sub(f"/{channel_id}/index.m3u8", template_url, count=1)
 
 
+def update_catchup_channel(extinf: str, old_id: str | None, new_id: str) -> str:
+    if not old_id or old_id == new_id:
+        return extinf
+    metadata, name = split_extinf(extinf)
+    metadata = CATCHUP_SOURCE_RE.sub(
+        lambda match: 'catchup-source="' + match.group(1).replace(f"/{old_id}/", f"/{new_id}/") + '"',
+        metadata,
+    )
+    return f"{metadata},{name}"
+
+
 def build_added_extinf(upstream: Entry, group: str) -> str:
     extinf = upstream.extinf
     if GROUP_RE.search(extinf):
@@ -236,7 +257,7 @@ def with_channel_number(extinf: str, number: int) -> str:
     match = re.search(r'tvg-id="[^"]*"', extinf)
     if match:
         return extinf[: match.end()] + f' tvg-chno="{number}"' + extinf[match.end():]
-    return re.sub(r"(#EXTINF:[^\s]+)", rf'\1 tvg-chno="{number}"', extinf, count=1)
+    return re.sub(r"(#EXTINF:[^\s,]+)", rf'\1 tvg-chno="{number}"', extinf, count=1)
 
 
 def number_entries(entries: list[tuple[str, str]]) -> list[tuple[str, str]]:
@@ -287,13 +308,13 @@ def sync_playlist(template_text: str, upstream_text: str, add_missing: bool) -> 
         if upstream and upstream.channel_id:
             new_url = proxy_url_from_template(entry.url, upstream.channel_id)
             stats["updated" if new_url != entry.url else "unchanged"] += 1
-            output_entries.append((entry.extinf, new_url))
+            output_entries.append((update_catchup_channel(entry.extinf, entry.channel_id, upstream.channel_id), new_url))
         else:
             stats["missing_upstream"] += 1
             output_entries.append((entry.extinf, entry.url))
 
-    if add_missing and template_entries:
-        template_url = template_entries[0].url
+    template_url = next((entry.url for entry in template_entries if entry.channel_id), None)
+    if add_missing and template_url:
         for key, upstream in upstream_best.items():
             if key in seen or is_excluded_channel_name(upstream.name, upstream.extinf) or not upstream.channel_id:
                 continue

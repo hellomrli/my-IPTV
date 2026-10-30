@@ -18,15 +18,21 @@ jobs:
     - name: Sync playlist
       run: python3 scripts/sync_iptv.py
 
+    - name: Build catchup and direct playlists
+      run: python3 scripts/build_playlists.py
+
+    - name: Test playlists and catchup service
+      run: python3 -m unittest discover -s tests -v
+
     - name: Commit changes
       run: |
-        if git diff --quiet -- IPTV.m3u; then
-          echo "IPTV.m3u is already current."
+        if git diff --quiet -- IPTV.m3u IPTV-catchup.m3u gx.m3u; then
+          echo "Playlists are already current."
           exit 0
         fi
 
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add IPTV.m3u
+        git add IPTV.m3u IPTV-catchup.m3u gx.m3u
         git commit -m "chore: sync IPTV playlist"
         git push

@@ -1,0 +1,39 @@
+name: Check IPTV
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.14']
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Check Python syntax
+      run: python3 -m compileall -q scripts tests
+
+    - name: Run offline regression tests
+      run: python3 -m unittest discover -s tests -v
+
+    - name: Check standalone OpenWrt export
+      run: |
+        package="$RUNNER_TEMP/luci-app-iptv-catchup"
+        python3 scripts/export_openwrt.py "$package"
+        python3 "$package/tests/check.py"
+        sh -n "$package/root/etc/init.d/iptv-catchup"
+        node --check "$package/root/www/luci-static/resources/view/iptv-catchup.js"
